@@ -111,7 +111,7 @@ export class QuotesResource {
    * ```
    */
   async create(data: CreateQuoteOptions): Promise<ApiResponse<Quote>> {
-    return this.client.post<ApiResponse<Quote>>('/v1/quotes', data as Record<string, unknown>);
+    return this.client.post<ApiResponse<Quote>>('/v1/quotes', data);
   }
 
   /**
@@ -132,7 +132,7 @@ export class QuotesResource {
    * ```
    */
   async update(id: string, data: UpdateQuoteOptions): Promise<ApiResponse<Quote>> {
-    return this.client.put<ApiResponse<Quote>>(`/v1/quotes/${id}`, data as Record<string, unknown>);
+    return this.client.put<ApiResponse<Quote>>(`/v1/quotes/${id}`, data);
   }
 
   /**

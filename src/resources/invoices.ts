@@ -112,7 +112,7 @@ export class InvoicesResource {
    * ```
    */
   async create(data: CreateInvoiceOptions): Promise<ApiResponse<Invoice>> {
-    return this.client.post<ApiResponse<Invoice>>('/v1/invoices', data as Record<string, unknown>);
+    return this.client.post<ApiResponse<Invoice>>('/v1/invoices', data);
   }
 
   /**
@@ -133,7 +133,7 @@ export class InvoicesResource {
    * ```
    */
   async update(id: string, data: UpdateInvoiceOptions): Promise<ApiResponse<Invoice>> {
-    return this.client.put<ApiResponse<Invoice>>(`/v1/invoices/${id}`, data as Record<string, unknown>);
+    return this.client.put<ApiResponse<Invoice>>(`/v1/invoices/${id}`, data);
   }
 
   /**

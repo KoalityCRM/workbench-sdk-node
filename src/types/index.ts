@@ -34,6 +34,10 @@ export interface ListOptions {
   page?: number;
   /** Items per page (1-100, defaults to 20) */
   per_page?: number;
+  /** Limit (alternative to per_page for offset-based pagination) */
+  limit?: number;
+  /** Offset for offset-based pagination */
+  offset?: number;
   /** Search query string */
   search?: string;
   /** Field to sort by */
@@ -58,17 +62,22 @@ export interface ResponseMeta {
 
 /**
  * Pagination information for list responses
+ * Supports both page-based and offset-based pagination
  */
 export interface Pagination {
-  /** Current page number */
-  page: number;
-  /** Items per page */
-  per_page: number;
+  /** Current page number (page-based) */
+  page?: number;
+  /** Items per page (page-based) */
+  per_page?: number;
   /** Total number of items */
   total: number;
-  /** Total number of pages */
-  total_pages: number;
-  /** Whether there's a next page */
+  /** Total number of pages (page-based) */
+  total_pages?: number;
+  /** Limit used for the query (offset-based) */
+  limit?: number;
+  /** Offset used for the query (offset-based) */
+  offset?: number;
+  /** Whether there are more items available */
   has_more: boolean;
 }
 
@@ -127,11 +136,13 @@ export interface Client {
   status: ClientStatus;
   source: string | null;
   notes: string | null;
+  /** Internal notes visible only to business users */
+  internal_notes: string | null;
   tags: string[] | null;
   next_contact_date: string | null;
   ask_for_review: boolean | null;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 /**
@@ -146,6 +157,7 @@ export interface CreateClientOptions {
   status?: ClientStatus;
   source?: string | null;
   notes?: string | null;
+  internal_notes?: string | null;
   tags?: string[] | null;
 }
 
@@ -171,7 +183,7 @@ export interface ListClientsOptions extends ListOptions {
 /**
  * Invoice status values
  */
-export type InvoiceStatus = 'draft' | 'sent' | 'viewed' | 'partial' | 'paid' | 'overdue' | 'cancelled';
+export type InvoiceStatus = 'draft' | 'sent' | 'viewed' | 'partial' | 'paid' | 'overdue' | 'cancelled' | 'voided';
 
 /**
  * Invoice line item
@@ -204,10 +216,14 @@ export interface Invoice {
   amount_paid: number;
   notes: string | null;
   terms: string | null;
+  /** Timestamp when the invoice was sent to the client */
+  sent_at: string | null;
+  /** Timestamp when the invoice was fully paid */
+  paid_at: string | null;
   items: InvoiceItem[];
   client?: Client;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 /**
@@ -280,10 +296,16 @@ export interface Quote {
   total: number;
   notes: string | null;
   terms: string | null;
+  /** Timestamp when the quote was sent to the client */
+  sent_at: string | null;
+  /** Timestamp when the quote was approved/accepted */
+  approved_at: string | null;
+  /** User ID or name of who approved the quote */
+  approved_by: string | null;
   items: QuoteItem[];
   client?: Client;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 /**
@@ -324,12 +346,12 @@ export interface ListQuotesOptions extends ListOptions {
 /**
  * Job status values
  */
-export type JobStatus = 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'on_hold';
+export type JobStatus = 'draft' | 'scheduled' | 'in_progress' | 'on_hold' | 'completed' | 'cancelled' | 'invoiced' | 'closed';
 
 /**
  * Job priority values
  */
-export type JobPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type JobPriority = 'low' | 'medium' | 'normal' | 'high' | 'urgent';
 
 /**
  * Job record
@@ -338,6 +360,8 @@ export interface Job {
   id: string;
   business_id: string;
   client_id: string | null;
+  /** Unique job number for display/reference */
+  job_number: string | null;
   title: string;
   description: string | null;
   status: JobStatus;
@@ -351,7 +375,7 @@ export interface Job {
   notes: string | null;
   client?: Client;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 /**
@@ -399,7 +423,7 @@ export type ServiceRequestStatus = 'new' | 'reviewing' | 'scheduled' | 'complete
 /**
  * Service request priority values
  */
-export type ServiceRequestPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type ServiceRequestPriority = 'low' | 'normal' | 'high' | 'urgent';
 
 /**
  * Service request record
@@ -408,6 +432,8 @@ export interface ServiceRequest {
   id: string;
   business_id: string;
   client_id: string | null;
+  /** Unique request number for display/reference (auto-generated) */
+  request_number: string;
   title: string;
   description: string | null;
   status: ServiceRequestStatus;
@@ -422,7 +448,7 @@ export interface ServiceRequest {
   notes: string | null;
   client?: Client;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 /**
@@ -466,22 +492,37 @@ export interface ListServiceRequestsOptions extends ListOptions {
  * Available webhook event types
  */
 export type WebhookEvent =
+  // Client events
   | 'client.created'
   | 'client.updated'
   | 'client.deleted'
+  // Invoice events
   | 'invoice.created'
+  | 'invoice.updated'
   | 'invoice.sent'
+  | 'invoice.viewed'
   | 'invoice.paid'
   | 'invoice.overdue'
+  | 'invoice.voided'
+  // Quote events
   | 'quote.created'
+  | 'quote.updated'
   | 'quote.sent'
+  | 'quote.viewed'
   | 'quote.accepted'
   | 'quote.rejected'
+  | 'quote.expired'
+  // Job events
   | 'job.created'
+  | 'job.updated'
   | 'job.status_changed'
   | 'job.completed'
+  | 'job.cancelled'
+  // Service request events
   | 'service_request.created'
-  | 'service_request.assigned';
+  | 'service_request.updated'
+  | 'service_request.assigned'
+  | 'service_request.completed';
 
 /**
  * Webhook subscription
@@ -494,8 +535,20 @@ export interface Webhook {
   events: WebhookEvent[];
   secret: string;
   is_active: boolean;
+  /** Custom metadata attached to the webhook */
+  metadata: Record<string, unknown> | null;
+  /** Number of consecutive delivery failures */
+  failure_count: number;
+  /** Timestamp of the last webhook trigger */
+  last_triggered_at: string | null;
+  /** Timestamp of the last successful delivery */
+  last_success_at: string | null;
+  /** Timestamp of the last failed delivery */
+  last_failure_at: string | null;
+  /** User ID who created the webhook */
+  created_by: string | null;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
 }
 
 /**
@@ -504,14 +557,26 @@ export interface Webhook {
 export interface WebhookDelivery {
   id: string;
   webhook_id: string;
+  /** Unique event ID for idempotency */
+  event_id: string;
   event_type: WebhookEvent;
   payload: Record<string, unknown>;
+  /** Headers sent with the webhook request */
+  request_headers: Record<string, string> | null;
   response_status: number | null;
+  /** Headers received in the response */
+  response_headers: Record<string, string> | null;
   response_body: string | null;
+  /** Response time in milliseconds */
+  response_time_ms: number | null;
   attempt_count: number;
+  /** Maximum number of delivery attempts */
+  max_attempts: number;
   next_retry_at: string | null;
   delivered_at: string | null;
   failed_at: string | null;
+  /** Error message if delivery failed */
+  error_message: string | null;
   created_at: string;
 }
 
@@ -522,6 +587,8 @@ export interface CreateWebhookOptions {
   name: string;
   url: string;
   events: WebhookEvent[];
+  /** Custom metadata to attach to the webhook */
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -532,6 +599,7 @@ export interface UpdateWebhookOptions {
   url?: string;
   events?: WebhookEvent[];
   is_active?: boolean;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -539,4 +607,22 @@ export interface UpdateWebhookOptions {
  */
 export interface ListWebhookDeliveriesOptions extends ListOptions {
   event_type?: WebhookEvent;
+  /** Filter by delivery status */
+  status?: 'pending' | 'delivered' | 'failed';
+}
+
+/**
+ * Response from regenerating a webhook secret
+ */
+export interface WebhookSecretResponse {
+  secret: string;
+}
+
+/**
+ * Webhook event type information
+ */
+export interface WebhookEventTypeInfo {
+  event: WebhookEvent;
+  description: string;
+  category: 'client' | 'invoice' | 'quote' | 'job' | 'service_request';
 }

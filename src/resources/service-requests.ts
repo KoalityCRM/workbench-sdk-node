@@ -113,7 +113,7 @@ export class ServiceRequestsResource {
    * ```
    */
   async create(data: CreateServiceRequestOptions): Promise<ApiResponse<ServiceRequest>> {
-    return this.client.post<ApiResponse<ServiceRequest>>('/v1/service-requests', data as Record<string, unknown>);
+    return this.client.post<ApiResponse<ServiceRequest>>('/v1/service-requests', data);
   }
 
   /**
@@ -134,7 +134,7 @@ export class ServiceRequestsResource {
    * ```
    */
   async update(id: string, data: UpdateServiceRequestOptions): Promise<ApiResponse<ServiceRequest>> {
-    return this.client.put<ApiResponse<ServiceRequest>>(`/v1/service-requests/${id}`, data as Record<string, unknown>);
+    return this.client.put<ApiResponse<ServiceRequest>>(`/v1/service-requests/${id}`, data);
   }
 
   /**

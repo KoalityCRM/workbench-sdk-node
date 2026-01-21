@@ -122,7 +122,7 @@ export class ClientsResource {
    * ```
    */
   async create(data: CreateClientOptions): Promise<ApiResponse<Client>> {
-    return this.client.post<ApiResponse<Client>>('/v1/clients', data as Record<string, unknown>);
+    return this.client.post<ApiResponse<Client>>('/v1/clients', data);
   }
 
   /**
@@ -141,7 +141,7 @@ export class ClientsResource {
    * ```
    */
   async update(id: string, data: UpdateClientOptions): Promise<ApiResponse<Client>> {
-    return this.client.put<ApiResponse<Client>>(`/v1/clients/${id}`, data as Record<string, unknown>);
+    return this.client.put<ApiResponse<Client>>(`/v1/clients/${id}`, data);
   }
 
   /**

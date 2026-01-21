@@ -109,7 +109,7 @@ export class JobsResource {
    * ```
    */
   async create(data: CreateJobOptions): Promise<ApiResponse<Job>> {
-    return this.client.post<ApiResponse<Job>>('/v1/jobs', data as Record<string, unknown>);
+    return this.client.post<ApiResponse<Job>>('/v1/jobs', data);
   }
 
   /**
@@ -135,7 +135,7 @@ export class JobsResource {
    * ```
    */
   async update(id: string, data: UpdateJobOptions): Promise<ApiResponse<Job>> {
-    return this.client.put<ApiResponse<Job>>(`/v1/jobs/${id}`, data as Record<string, unknown>);
+    return this.client.put<ApiResponse<Job>>(`/v1/jobs/${id}`, data);
   }
 
   /**

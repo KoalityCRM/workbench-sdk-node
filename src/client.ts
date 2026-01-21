@@ -9,8 +9,6 @@
 
 import type {
   WorkbenchConfig,
-  ApiResponse,
-  ListResponse,
   ApiError,
 } from './types/index.js';
 
@@ -68,7 +66,7 @@ export interface RequestOptions {
   /** Query parameters */
   query?: Record<string, string | number | boolean | undefined>;
   /** Request body */
-  body?: Record<string, unknown>;
+  body?: unknown;
   /** Additional headers */
   headers?: Record<string, string>;
 }
@@ -295,14 +293,14 @@ export class WorkbenchClient {
   /**
    * Make a POST request
    */
-  async post<T>(path: string, body?: Record<string, unknown>): Promise<T> {
+  async post<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>({ method: 'POST', path, body });
   }
 
   /**
    * Make a PUT request
    */
-  async put<T>(path: string, body?: Record<string, unknown>): Promise<T> {
+  async put<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>({ method: 'PUT', path, body });
   }
 

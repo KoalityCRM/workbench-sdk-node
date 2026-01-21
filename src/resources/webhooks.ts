@@ -15,6 +15,8 @@ import type {
   ListOptions,
   ApiResponse,
   ListResponse,
+  WebhookSecretResponse,
+  WebhookEventTypeInfo,
 } from '../types/index.js';
 
 /**
@@ -111,7 +113,7 @@ export class WebhooksResource {
    * ```
    */
   async create(data: CreateWebhookOptions): Promise<ApiResponse<Webhook>> {
-    return this.client.post<ApiResponse<Webhook>>('/v1/webhooks', data as Record<string, unknown>);
+    return this.client.post<ApiResponse<Webhook>>('/v1/webhooks', data);
   }
 
   /**
@@ -133,7 +135,7 @@ export class WebhooksResource {
    * ```
    */
   async update(id: string, data: UpdateWebhookOptions): Promise<ApiResponse<Webhook>> {
-    return this.client.put<ApiResponse<Webhook>>(`/v1/webhooks/${id}`, data as Record<string, unknown>);
+    return this.client.put<ApiResponse<Webhook>>(`/v1/webhooks/${id}`, data);
   }
 
   /**
@@ -203,5 +205,72 @@ export class WebhooksResource {
    */
   async test(id: string): Promise<ApiResponse<{ message: string; delivery_id: string }>> {
     return this.client.post<ApiResponse<{ message: string; delivery_id: string }>>(`/v1/webhooks/${id}/test`);
+  }
+
+  /**
+   * Get a single webhook delivery
+   *
+   * Returns details about a specific delivery attempt, including
+   * request/response headers and timing information.
+   *
+   * @param webhookId - Webhook UUID
+   * @param deliveryId - Delivery UUID
+   * @returns Delivery details
+   *
+   * @example
+   * ```typescript
+   * const { data: delivery } = await workbench.webhooks.getDelivery(
+   *   'webhook-uuid',
+   *   'delivery-uuid'
+   * );
+   * console.log(`Status: ${delivery.response_status}`);
+   * console.log(`Response time: ${delivery.response_time_ms}ms`);
+   * ```
+   */
+  async getDelivery(webhookId: string, deliveryId: string): Promise<ApiResponse<WebhookDelivery>> {
+    return this.client.get<ApiResponse<WebhookDelivery>>(
+      `/v1/webhooks/${webhookId}/deliveries/${deliveryId}`
+    );
+  }
+
+  /**
+   * Regenerate webhook secret
+   *
+   * Generates a new secret for the webhook. The old secret will
+   * immediately stop working. Make sure to update your webhook
+   * handler with the new secret.
+   *
+   * @param id - Webhook UUID
+   * @returns New webhook secret
+   *
+   * @example
+   * ```typescript
+   * const { data } = await workbench.webhooks.regenerateSecret('webhook-uuid');
+   * console.log('New secret:', data.secret);
+   * // Update your webhook handler with the new secret!
+   * ```
+   */
+  async regenerateSecret(id: string): Promise<ApiResponse<WebhookSecretResponse>> {
+    return this.client.post<ApiResponse<WebhookSecretResponse>>(`/v1/webhooks/${id}/secret`);
+  }
+
+  /**
+   * List available webhook event types
+   *
+   * Returns all event types that can be subscribed to, with
+   * descriptions and categories.
+   *
+   * @returns List of available event types
+   *
+   * @example
+   * ```typescript
+   * const { data: eventTypes } = await workbench.webhooks.listEventTypes();
+   * eventTypes.forEach(et => {
+   *   console.log(`${et.event} (${et.category}): ${et.description}`);
+   * });
+   * ```
+   */
+  async listEventTypes(): Promise<ApiResponse<WebhookEventTypeInfo[]>> {
+    return this.client.get<ApiResponse<WebhookEventTypeInfo[]>>('/v1/webhooks/event-types');
   }
 }
