@@ -38,6 +38,7 @@ export { QuotesResource } from './resources/quotes.js';
 export { JobsResource } from './resources/jobs.js';
 export { ServiceRequestsResource } from './resources/service-requests.js';
 export { WebhooksResource } from './resources/webhooks.js';
+export { NotificationsResource } from './resources/notifications.js';
 
 // Webhook utilities
 export {
@@ -108,4 +109,13 @@ export type {
   CreateWebhookOptions,
   UpdateWebhookOptions,
   ListWebhookDeliveriesOptions,
+
+  // Notification types
+  NotificationType,
+  NotificationEvent,
+  BusinessUserRole,
+  SendToClientOptions,
+  SendToTeamOptions,
+  SendCustomNotificationOptions,
+  NotificationResult,
 } from './types/index.js';

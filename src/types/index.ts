@@ -118,9 +118,14 @@ export interface ApiError {
 // ===========================================
 
 /**
- * Client status values
+ * Client status values (lifecycle status)
  */
-export type ClientStatus = 'active' | 'inactive' | 'lead' | 'prospect';
+export type ClientStatus = 'active' | 'inactive' | 'archived';
+
+/**
+ * Lead status values (pipeline stage for leads)
+ */
+export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';
 
 /**
  * Client record
@@ -134,6 +139,8 @@ export interface Client {
   email: string | null;
   phone: string | null;
   status: ClientStatus;
+  /** Lead pipeline stage */
+  lead_status: LeadStatus | null;
   source: string | null;
   notes: string | null;
   /** Internal notes visible only to business users */
@@ -154,7 +161,10 @@ export interface CreateClientOptions {
   company?: string | null;
   email?: string | null;
   phone?: string | null;
+  /** Client lifecycle status (defaults to 'active') */
   status?: ClientStatus;
+  /** Lead pipeline stage (defaults to 'new') */
+  lead_status?: LeadStatus | null;
   source?: string | null;
   notes?: string | null;
   internal_notes?: string | null;
@@ -174,6 +184,7 @@ export interface UpdateClientOptions extends Partial<CreateClientOptions> {
  */
 export interface ListClientsOptions extends ListOptions {
   status?: ClientStatus;
+  lead_status?: LeadStatus;
 }
 
 // ===========================================
@@ -418,7 +429,7 @@ export interface ListJobsOptions extends ListOptions {
 /**
  * Service request status values
  */
-export type ServiceRequestStatus = 'new' | 'reviewing' | 'scheduled' | 'completed' | 'cancelled' | 'declined';
+export type ServiceRequestStatus = 'new' | 'contacted' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'rejected';
 
 /**
  * Service request priority values
@@ -625,4 +636,105 @@ export interface WebhookEventTypeInfo {
   event: WebhookEvent;
   description: string;
   category: 'client' | 'invoice' | 'quote' | 'job' | 'service_request';
+}
+
+// ===========================================
+// NOTIFICATION TYPES
+// ===========================================
+
+/**
+ * Notification type - who receives the notification
+ */
+export type NotificationType = 'CLIENT' | 'BUSINESS';
+
+/**
+ * Notification events supported by the SDK
+ * - sdk_client_created: Welcome notification for new clients
+ * - sdk_request_created: New service request notification
+ * - sdk_quote_created: Quote sent notification
+ * - sdk_invoice_created: Invoice sent notification
+ * - sdk_job_created: Job scheduled notification
+ * - sdk_custom: Custom notification (requires subject/html overrides)
+ */
+export type NotificationEvent =
+  | 'sdk_client_created'
+  | 'sdk_request_created'
+  | 'sdk_quote_created'
+  | 'sdk_invoice_created'
+  | 'sdk_job_created'
+  | 'sdk_custom';
+
+/**
+ * Business user roles for BUSINESS notifications
+ */
+export type BusinessUserRole = 'owner' | 'admin' | 'manager' | 'member';
+
+/**
+ * Base options for sending notifications
+ */
+export interface SendNotificationBaseOptions {
+  /** Template data for variable interpolation (e.g., client_name, quote_total) */
+  templateData?: Record<string, string | number>;
+  /** Custom subject line (overrides template) */
+  subjectOverride?: string;
+  /** Custom HTML body (overrides template) */
+  htmlOverride?: string;
+  /** Entity type for audit logging (e.g., 'client', 'invoice') */
+  entityType?: string;
+  /** Entity ID for audit logging */
+  entityId?: string;
+}
+
+/**
+ * Options for sending a notification to a client
+ */
+export interface SendToClientOptions extends SendNotificationBaseOptions {
+  /** Client ID to send the notification to */
+  clientId: string;
+  /** Event type for template selection */
+  event: NotificationEvent;
+}
+
+/**
+ * Options for sending a notification to business team members
+ */
+export interface SendToTeamOptions extends SendNotificationBaseOptions {
+  /** Event type for template selection */
+  event: NotificationEvent;
+  /** Roles to notify (defaults to all if not specified) */
+  roles?: BusinessUserRole[];
+}
+
+/**
+ * Options for sending a custom notification
+ */
+export interface SendCustomNotificationOptions extends SendNotificationBaseOptions {
+  /** Notification type - CLIENT or BUSINESS */
+  type: NotificationType;
+  /** Client ID (required for CLIENT type) */
+  clientId?: string;
+  /** Roles to notify (for BUSINESS type) */
+  roles?: BusinessUserRole[];
+  /** Required: Custom subject line */
+  subject: string;
+  /** Required: Custom HTML body */
+  html: string;
+}
+
+/**
+ * Result of sending notifications
+ */
+export interface NotificationResult {
+  /** Whether at least one notification was sent successfully */
+  success: boolean;
+  /** Unique ID for this notification batch */
+  notification_id: string;
+  /** Total number of recipients */
+  recipients_count: number;
+  /** Number of successful email sends */
+  sent_count: number;
+  /** Number of failed email sends */
+  failed_count: number;
+  /** Error messages if any failures occurred */
+  errors?: string[];
 }

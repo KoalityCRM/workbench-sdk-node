@@ -18,6 +18,7 @@ import { QuotesResource } from './resources/quotes.js';
 import { JobsResource } from './resources/jobs.js';
 import { ServiceRequestsResource } from './resources/service-requests.js';
 import { WebhooksResource } from './resources/webhooks.js';
+import { NotificationsResource } from './resources/notifications.js';
 
 /**
  * Default configuration values
@@ -116,6 +117,8 @@ export class WorkbenchClient {
   public readonly serviceRequests: ServiceRequestsResource;
   /** Webhooks resource */
   public readonly webhooks: WebhooksResource;
+  /** Notifications resource */
+  public readonly notifications: NotificationsResource;
 
   /**
    * Create a new Workbench client
@@ -143,6 +146,7 @@ export class WorkbenchClient {
     this.jobs = new JobsResource(this);
     this.serviceRequests = new ServiceRequestsResource(this);
     this.webhooks = new WebhooksResource(this);
+    this.notifications = new NotificationsResource(this);
   }
 
   /**
