@@ -1,42 +1,41 @@
 /**
- * @file resources/service-requests.ts
- * @description Service Requests resource for the Workbench SDK
+ * Requests resource for the Workbench SDK.
  *
  * Provides methods for managing service requests in Workbench CRM.
+ *
+ * @module resources/requests
  */
 
-import type { WorkbenchClient } from '../client.js';
-import type {
+import { WorkbenchClient } from '../client.js';
+import {
   ServiceRequest,
+  ApiResponse,
+  ListResponse,
   CreateServiceRequestOptions,
   UpdateServiceRequestOptions,
   ListServiceRequestsOptions,
-  ApiResponse,
-  ListResponse,
 } from '../types/index.js';
 
 /**
- * Service Requests resource
+ * Requests resource for managing service requests.
+ *
+ * Service requests track customer service inquiries, including
+ * contact information, service details, and status.
  *
  * @example
  * ```typescript
  * const workbench = new WorkbenchClient({ apiKey: 'wbk_live_xxx' });
  *
- * // Create a service request
- * const { data: request } = await workbench.serviceRequests.create({
- *   title: 'Leaky Faucet Repair',
- *   contact_name: 'Jane Smith',
- *   contact_email: 'jane@example.com',
- *   contact_phone: '+1-555-987-6543',
- *   address: '123 Main St, Anytown, USA',
- *   priority: 'high'
+ * // Create a new request
+ * const { data: request } = await workbench.requests.create({
+ *   title: 'AC Not Cooling',
+ *   contact_name: 'John Doe',
+ *   contact_email: 'john@example.com',
+ *   priority: 'urgent'
  * });
- *
- * // Update request status
- * await workbench.serviceRequests.update(request.id, { status: 'scheduled' });
  * ```
  */
-export class ServiceRequestsResource {
+export class RequestsResource {
   private readonly client: WorkbenchClient;
 
   constructor(client: WorkbenchClient) {
@@ -44,17 +43,17 @@ export class ServiceRequestsResource {
   }
 
   /**
-   * List all service requests
+   * List all requests
    *
    * Returns a paginated list of service requests for the authenticated business.
    *
    * @param options - List options (pagination, filtering, sorting)
-   * @returns Paginated list of service requests
+   * @returns Paginated list of requests
    *
    * @example
    * ```typescript
    * // List new requests
-   * const { data, pagination } = await workbench.serviceRequests.list({
+   * const { data, pagination } = await workbench.requests.list({
    *   status: 'new',
    *   priority: 'urgent',
    *   per_page: 50
@@ -62,7 +61,7 @@ export class ServiceRequestsResource {
    * ```
    */
   async list(options: ListServiceRequestsOptions = {}): Promise<ListResponse<ServiceRequest>> {
-    return this.client.get<ListResponse<ServiceRequest>>('/v1/service-requests', {
+    return this.client.get<ListResponse<ServiceRequest>>('/v1/requests', {
       page: options.page,
       per_page: options.per_page,
       search: options.search,
@@ -75,30 +74,30 @@ export class ServiceRequestsResource {
   }
 
   /**
-   * Get a service request by ID
+   * Get a request by ID
    *
-   * @param id - Service request UUID
-   * @returns Service request details
+   * @param id - Request UUID
+   * @returns Request details
    *
    * @example
    * ```typescript
-   * const { data: request } = await workbench.serviceRequests.get('request-uuid');
+   * const { data: request } = await workbench.requests.get('request-uuid');
    * console.log(`Request: ${request.title} (${request.status})`);
    * ```
    */
   async get(id: string): Promise<ApiResponse<ServiceRequest>> {
-    return this.client.get<ApiResponse<ServiceRequest>>(`/v1/service-requests/${id}`);
+    return this.client.get<ApiResponse<ServiceRequest>>(`/v1/requests/${id}`);
   }
 
   /**
-   * Create a new service request
+   * Create a new request
    *
-   * @param data - Service request data
-   * @returns Created service request
+   * @param data - Request data
+   * @returns Created request
    *
    * @example
    * ```typescript
-   * const { data: request } = await workbench.serviceRequests.create({
+   * const { data: request } = await workbench.requests.create({
    *   title: 'AC Not Cooling',
    *   description: 'Air conditioner is running but not producing cold air',
    *   contact_name: 'John Doe',
@@ -113,20 +112,20 @@ export class ServiceRequestsResource {
    * ```
    */
   async create(data: CreateServiceRequestOptions): Promise<ApiResponse<ServiceRequest>> {
-    return this.client.post<ApiResponse<ServiceRequest>>('/v1/service-requests', data);
+    return this.client.post<ApiResponse<ServiceRequest>>('/v1/requests', data);
   }
 
   /**
-   * Update a service request
+   * Update a request
    *
-   * @param id - Service request UUID
+   * @param id - Request UUID
    * @param data - Fields to update
-   * @returns Updated service request
+   * @returns Updated request
    *
    * @example
    * ```typescript
    * // Assign to client and schedule
-   * const { data: request } = await workbench.serviceRequests.update('request-uuid', {
+   * const { data: request } = await workbench.requests.update('request-uuid', {
    *   client_id: 'client-uuid',
    *   status: 'scheduled',
    *   notes: 'Scheduled for Monday morning'
@@ -134,22 +133,22 @@ export class ServiceRequestsResource {
    * ```
    */
   async update(id: string, data: UpdateServiceRequestOptions): Promise<ApiResponse<ServiceRequest>> {
-    return this.client.put<ApiResponse<ServiceRequest>>(`/v1/service-requests/${id}`, data);
+    return this.client.put<ApiResponse<ServiceRequest>>(`/v1/requests/${id}`, data);
   }
 
   /**
-   * Delete a service request
+   * Delete a request
    *
-   * Permanently deletes a service request. This action cannot be undone.
+   * Permanently deletes a request. This action cannot be undone.
    *
-   * @param id - Service request UUID
+   * @param id - Request UUID
    *
    * @example
    * ```typescript
-   * await workbench.serviceRequests.delete('request-uuid');
+   * await workbench.requests.delete('request-uuid');
    * ```
    */
   async delete(id: string): Promise<void> {
-    await this.client.delete<void>(`/v1/service-requests/${id}`);
+    await this.client.delete<void>(`/v1/requests/${id}`);
   }
 }

@@ -36,7 +36,7 @@ export { ClientsResource } from './resources/clients.js';
 export { InvoicesResource } from './resources/invoices.js';
 export { QuotesResource } from './resources/quotes.js';
 export { JobsResource } from './resources/jobs.js';
-export { ServiceRequestsResource } from './resources/service-requests.js';
+export { RequestsResource } from './resources/requests.js';
 export { WebhooksResource } from './resources/webhooks.js';
 export { NotificationsResource } from './resources/notifications.js';
 

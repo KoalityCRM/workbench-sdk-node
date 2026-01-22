@@ -16,7 +16,7 @@ import { ClientsResource } from './resources/clients.js';
 import { InvoicesResource } from './resources/invoices.js';
 import { QuotesResource } from './resources/quotes.js';
 import { JobsResource } from './resources/jobs.js';
-import { ServiceRequestsResource } from './resources/service-requests.js';
+import { RequestsResource } from './resources/requests.js';
 import { WebhooksResource } from './resources/webhooks.js';
 import { NotificationsResource } from './resources/notifications.js';
 
@@ -113,8 +113,8 @@ export class WorkbenchClient {
   public readonly quotes: QuotesResource;
   /** Jobs resource */
   public readonly jobs: JobsResource;
-  /** Service requests resource */
-  public readonly serviceRequests: ServiceRequestsResource;
+  /** Requests resource */
+  public readonly requests: RequestsResource;
   /** Webhooks resource */
   public readonly webhooks: WebhooksResource;
   /** Notifications resource */
@@ -144,7 +144,7 @@ export class WorkbenchClient {
     this.invoices = new InvoicesResource(this);
     this.quotes = new QuotesResource(this);
     this.jobs = new JobsResource(this);
-    this.serviceRequests = new ServiceRequestsResource(this);
+    this.requests = new RequestsResource(this);
     this.webhooks = new WebhooksResource(this);
     this.notifications = new NotificationsResource(this);
   }
