@@ -429,12 +429,12 @@ export interface ListJobsOptions extends ListOptions {
 /**
  * Service request status values
  */
-export type ServiceRequestStatus = 'new' | 'contacted' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'rejected';
+export type ServiceRequestStatus = 'new' | 'in_progress' | 'assessment_complete' | 'completed' | 'cancelled';
 
 /**
  * Service request priority values
  */
-export type ServiceRequestPriority = 'low' | 'normal' | 'high' | 'urgent';
+export type ServiceRequestPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 /**
  * Service request record
