@@ -39,6 +39,7 @@ export { JobsResource } from './resources/jobs.js';
 export { RequestsResource } from './resources/requests.js';
 export { WebhooksResource } from './resources/webhooks.js';
 export { NotificationsResource } from './resources/notifications.js';
+export { IntegrationsResource } from './resources/integrations.js';
 
 // Webhook utilities
 export {
@@ -118,4 +119,15 @@ export type {
   SendToTeamOptions,
   SendCustomNotificationOptions,
   NotificationResult,
+
+  // Integration marketplace types
+  IntegrationStatus,
+  IntegrationCategory,
+  IntegrationScope,
+  Integration,
+  IntegrationReview,
+  ListIntegrationsOptions,
+  ListIntegrationReviewsOptions,
+  InstalledIntegration,
+  InstallIntegrationOptions,
 } from './types/index.js';

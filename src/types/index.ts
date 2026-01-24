@@ -738,3 +738,159 @@ export interface NotificationResult {
   /** Error messages if any failures occurred */
   errors?: string[];
 }
+
+
+// ===========================================
+// INTEGRATION MARKETPLACE TYPES
+// ===========================================
+
+/**
+ * Integration status values
+ */
+export type IntegrationStatus = 'draft' | 'pending_review' | 'published' | 'rejected' | 'suspended';
+
+/**
+ * Integration category values
+ */
+export type IntegrationCategory =
+  | 'accounting'
+  | 'analytics'
+  | 'automation'
+  | 'communication'
+  | 'crm'
+  | 'ecommerce'
+  | 'marketing'
+  | 'payments'
+  | 'productivity'
+  | 'scheduling'
+  | 'other';
+
+/**
+ * OAuth scope information
+ */
+export interface IntegrationScope {
+  /** Scope identifier (e.g., 'clients:read') */
+  scope: string;
+  /** Human-readable description of what the scope allows */
+  description: string;
+  /** Whether this scope is required for the integration */
+  required: boolean;
+}
+
+/**
+ * Published integration in the marketplace
+ */
+export interface Integration {
+  id: string;
+  /** URL-friendly identifier */
+  slug: string;
+  name: string;
+  /** Short description (max 200 chars) */
+  short_description: string;
+  /** Full description with markdown support */
+  description: string;
+  /** Category for filtering/discovery */
+  category: IntegrationCategory;
+  /** URL to integration icon/logo */
+  icon_url: string | null;
+  /** URL to integration website */
+  website_url: string | null;
+  /** Support email for the integration */
+  support_email: string | null;
+  /** Privacy policy URL */
+  privacy_policy_url: string | null;
+  /** Terms of service URL */
+  terms_url: string | null;
+  /** OAuth scopes required by the integration */
+  scopes: IntegrationScope[];
+  /** Webhook events the integration subscribes to */
+  webhook_events: WebhookEvent[];
+  /** Number of businesses using this integration */
+  install_count: number;
+  /** Average rating (1-5) */
+  average_rating: number | null;
+  /** Number of reviews */
+  review_count: number;
+  /** Developer/company information */
+  developer: {
+    id: string;
+    name: string;
+    website: string | null;
+    verified: boolean;
+  };
+  /** When the integration was published */
+  published_at: string;
+  created_at: string;
+  updated_at: string | null;
+}
+
+/**
+ * Integration review from a user
+ */
+export interface IntegrationReview {
+  id: string;
+  integration_id: string;
+  /** Rating 1-5 */
+  rating: number;
+  /** Review title */
+  title: string | null;
+  /** Review body */
+  content: string | null;
+  /** Reviewer display name */
+  reviewer_name: string;
+  /** When the review was submitted */
+  created_at: string;
+}
+
+/**
+ * Options for listing integrations
+ */
+export interface ListIntegrationsOptions extends ListOptions {
+  /** Filter by category */
+  category?: IntegrationCategory;
+  /** Filter by scope (returns integrations that request this scope) */
+  scope?: string;
+  /** Sort by: 'popular' | 'recent' | 'rating' | 'name' */
+  sort_by?: 'popular' | 'recent' | 'rating' | 'name';
+}
+
+/**
+ * Options for listing integration reviews
+ */
+export interface ListIntegrationReviewsOptions extends ListOptions {
+  /** Minimum rating to filter by */
+  min_rating?: number;
+}
+
+/**
+ * Installed integration on a business account
+ */
+export interface InstalledIntegration {
+  id: string;
+  integration_id: string;
+  integration: Integration;
+  /** OAuth access token (masked for security) */
+  access_token_prefix: string;
+  /** Scopes that were granted */
+  granted_scopes: string[];
+  /** When the integration was installed */
+  installed_at: string;
+  /** User who installed the integration */
+  installed_by: string | null;
+  /** Whether the integration is currently active */
+  is_active: boolean;
+}
+
+/**
+ * Options for installing an integration
+ */
+export interface InstallIntegrationOptions {
+  /** Integration ID to install */
+  integration_id: string;
+  /** Scopes to grant (must be subset of integration's requested scopes) */
+  scopes: string[];
+  /** OAuth authorization code (from consent flow) */
+  authorization_code: string;
+  /** PKCE code verifier */
+  code_verifier: string;
+}
