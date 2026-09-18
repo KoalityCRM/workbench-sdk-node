@@ -82,6 +82,7 @@ export class ClientsResource {
       sort: options.sort,
       order: options.order,
       status: options.status,
+      lead_status: options.lead_status,
     });
   }
 

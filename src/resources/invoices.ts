@@ -37,6 +37,12 @@ import type {
  * await workbench.invoices.send(invoice.id);
  * ```
  */
+function validateWriteStatus(status: unknown): void {
+  if (status !== undefined && (typeof status !== 'string' || !['draft', 'sent', 'viewed', 'overdue', 'cancelled'].includes(status))) {
+    throw new TypeError('Invoice status must be draft, sent, viewed, overdue, or cancelled; payment states are read-only');
+  }
+}
+
 export class InvoicesResource {
   private readonly client: WorkbenchClient;
 
@@ -112,6 +118,7 @@ export class InvoicesResource {
    * ```
    */
   async create(data: CreateInvoiceOptions): Promise<ApiResponse<Invoice>> {
+    validateWriteStatus(data.status);
     return this.client.post<ApiResponse<Invoice>>('/v1/invoices', data);
   }
 
@@ -127,12 +134,13 @@ export class InvoicesResource {
    * @example
    * ```typescript
    * const { data: invoice } = await workbench.invoices.update('invoice-uuid', {
-   *   status: 'paid',
-   *   notes: 'Paid via bank transfer on 2024-01-15'
+   *   status: 'sent',
+   *   notes: 'Payment due within 30 days'
    * });
    * ```
    */
   async update(id: string, data: UpdateInvoiceOptions): Promise<ApiResponse<Invoice>> {
+    validateWriteStatus(data.status);
     return this.client.put<ApiResponse<Invoice>>(`/v1/invoices/${id}`, data);
   }
 
@@ -154,10 +162,10 @@ export class InvoicesResource {
   }
 
   /**
-   * Send an invoice via email
+   * Mark an invoice as sent
    *
-   * Sends the invoice to the client's email address. The invoice
-   * status will be updated to 'sent' if currently 'draft'.
+   * Marks a draft invoice as sent and emits its API event.
+   * This endpoint does not deliver email; use the application's sending workflow.
    *
    * @param id - Invoice UUID
    * @returns Success response
@@ -168,7 +176,7 @@ export class InvoicesResource {
    * console.log('Invoice sent successfully');
    * ```
    */
-  async send(id: string): Promise<ApiResponse<{ message: string; invoice_id: string }>> {
-    return this.client.post<ApiResponse<{ message: string; invoice_id: string }>>(`/v1/invoices/${id}/send`);
+  async send(id: string): Promise<ApiResponse<Invoice>> {
+    return this.client.post<ApiResponse<Invoice>>(`/v1/invoices/${id}/send`);
   }
 }

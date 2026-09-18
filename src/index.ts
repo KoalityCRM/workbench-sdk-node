@@ -67,6 +67,7 @@ export type {
   // Client types
   Client,
   ClientStatus,
+  LeadStatus,
   CreateClientOptions,
   UpdateClientOptions,
   ListClientsOptions,
@@ -75,6 +76,7 @@ export type {
   Invoice,
   InvoiceItem,
   InvoiceStatus,
+  InvoiceWriteStatus,
   CreateInvoiceOptions,
   UpdateInvoiceOptions,
   ListInvoicesOptions,

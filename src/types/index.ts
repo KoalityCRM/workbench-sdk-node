@@ -194,6 +194,9 @@ export interface ListClientsOptions extends ListOptions {
 /**
  * Invoice status values
  */
+/** Statuses writable through invoice create/update. Payment states are read-only. */
+export type InvoiceWriteStatus = 'draft' | 'sent' | 'viewed' | 'overdue' | 'cancelled';
+
 export type InvoiceStatus = 'draft' | 'sent' | 'viewed' | 'partial' | 'paid' | 'overdue' | 'cancelled' | 'voided';
 
 /**
@@ -204,6 +207,8 @@ export interface InvoiceItem {
   description: string;
   quantity: number;
   unit_price: number;
+  taxable?: boolean;
+  tax_rate?: number | null;
   sort_order?: number;
 }
 
@@ -231,8 +236,9 @@ export interface Invoice {
   sent_at: string | null;
   /** Timestamp when the invoice was fully paid */
   paid_at: string | null;
-  items: InvoiceItem[];
-  client?: Client;
+  /** Included by detail/create/update; omitted from list and send responses. */
+  items?: InvoiceItem[];
+  client?: Client | null;
   created_at: string;
   updated_at: string | null;
 }
@@ -243,10 +249,11 @@ export interface Invoice {
 export interface CreateInvoiceOptions {
   client_id?: string | null;
   job_id?: string | null;
-  status?: InvoiceStatus;
+  status?: InvoiceWriteStatus;
   issue_date?: string;
   due_date?: string | null;
   tax_rate?: number | null;
+  discount_type?: 'percentage' | 'fixed' | null;
   discount_amount?: number | null;
   notes?: string | null;
   terms?: string | null;
@@ -285,6 +292,8 @@ export interface QuoteItem {
   description: string;
   quantity: number;
   unit_price: number;
+  taxable?: boolean;
+  tax_rate?: number | null;
   sort_order?: number;
 }
 
@@ -313,8 +322,9 @@ export interface Quote {
   approved_at: string | null;
   /** User ID or name of who approved the quote */
   approved_by: string | null;
-  items: QuoteItem[];
-  client?: Client;
+  /** Included by detail/create/update; omitted from list and send responses. */
+  items?: QuoteItem[];
+  client?: Client | null;
   created_at: string;
   updated_at: string | null;
 }
@@ -329,6 +339,7 @@ export interface CreateQuoteOptions {
   issue_date?: string;
   valid_until?: string | null;
   tax_rate?: number | null;
+  discount_type?: 'percentage' | 'fixed' | null;
   discount_amount?: number | null;
   notes?: string | null;
   terms?: string | null;

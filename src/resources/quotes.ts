@@ -153,10 +153,10 @@ export class QuotesResource {
   }
 
   /**
-   * Send a quote via email
+   * Mark a quote as sent
    *
-   * Sends the quote to the client's email address. The quote
-   * status will be updated to 'sent' if currently 'draft'.
+   * Marks a draft quote as sent and emits its API event.
+   * This endpoint does not deliver email; use the application's sending workflow.
    *
    * @param id - Quote UUID
    * @returns Success response
@@ -167,7 +167,7 @@ export class QuotesResource {
    * console.log('Quote sent successfully');
    * ```
    */
-  async send(id: string): Promise<ApiResponse<{ message: string; quote_id: string }>> {
-    return this.client.post<ApiResponse<{ message: string; quote_id: string }>>(`/v1/quotes/${id}/send`);
+  async send(id: string): Promise<ApiResponse<Quote>> {
+    return this.client.post<ApiResponse<Quote>>(`/v1/quotes/${id}/send`);
   }
 }
