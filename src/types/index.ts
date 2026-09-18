@@ -392,7 +392,10 @@ export interface Job {
   scheduled_end: string | null;
   actual_start: string | null;
   actual_end: string | null;
+  /** Estimated duration in minutes. */
   estimated_duration: number | null;
+  estimated_hours?: number | null;
+  service_address?: Record<string, unknown> | null;
   address_id: string | null;
   notes: string | null;
   client?: Client;
